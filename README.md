@@ -7,7 +7,7 @@ A full-stack data science web application that predicts NBA player prop outcomes
 ⚠️ For educational and portfolio purposes only. Not financial or betting advice.
 
 🖼️ Preview
-Show Image
+(<Screenshot 2026-03-10 at 3.57.27 PM.png>)
 A dark-mode dashboard inspired by PrizePicks, featuring:
 ML-powered OVER/UNDER prediction vs. your submitted prop line
 Last-10 game hit rate with animated progress bar
@@ -53,7 +53,7 @@ Fully responsive dark-mode design
 
 
 ⚙️ Local Setup
-bash# 1. Clone the repo
+# 1. Clone the repo
 git clone https://github.com/YOUR_USERNAME/nba-props-edge.git
 cd nba-props-edge
 
@@ -73,7 +73,8 @@ python3 main.py
 # 6. Open in browser
 # http://127.0.0.1:5000
 
-Get a free Odds API key at the-odds-api.com (500 req/month free). The app works without it using mock lines.
+> 💻 Prefer to run locally? Follow the steps above. The app works fully offline with mock sportsbook lines.
+> 🌐 Or just visit the live site at [propsedge.onrender.com](https://propsedge.onrender.com) — no setup needed.
 
 
 📁 Project Structure
@@ -133,4 +134,4 @@ Full-stack web development (Python/Flask + JS/HTML/CSS)
 Interactive data visualization
 Sports analytics and statistical reasoning
 
-GitHub · LinkedIn
+GitHub: Ramneek05 · LinkedIn: https://www.linkedin.com/in/ramneekchohan/
