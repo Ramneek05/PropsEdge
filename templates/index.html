@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PropsEdge — NBA Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-card: #161d2e;
+      --bg-card-hover: #1a2235;
+      --bg-input: #1e2a3a;
+      --accent-green: #00d68f;
+      --accent-red: #ff4d6d;
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-gold: #f59e0b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+      --border: rgba(255,255,255,0.07);
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 0%, rgba(139,92,246,0.08) 0%, transparent 50%);
+    }
+    .navbar-custom {
+      background: rgba(10,14,26,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo {
+      font-size: 1.3rem; font-weight: 800;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    .nav-badge {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 6px; padding: 3px 9px;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; color: white;
+    }
+    .search-section {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+    }
+    .section-label {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .fc {
+      background: var(--bg-input) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 12px !important; color: var(--text-primary) !important;
+      padding: 12px 16px !important; font-size: 0.95rem !important;
+      transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+    }
+    .fc:focus {
+      border-color: var(--accent-blue) !important;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important; outline: none !important;
+    }
+    .fc::placeholder { color: var(--text-muted) !important; }
+    .stat-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .stat-pill {
+      padding: 9px 18px; border-radius: 50px;
+      border: 1px solid var(--border); background: var(--bg-input);
+      color: var(--text-secondary); font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .stat-pill:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+    .stat-pill.active {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-color: transparent; color: white;
+      box-shadow: 0 0 20px rgba(59,130,246,0.3);
+    }
+    .btn-analyze {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border: none; border-radius: 12px; color: white;
+      font-weight: 700; font-size: 0.95rem;
+      padding: 12px 32px; transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-analyze:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(59,130,246,0.4); color: white; }
+    #autocomplete-list {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: #1e2a3a; border: 1px solid var(--border);
+      border-radius: 12px; z-index: 999; max-height: 200px;
+      overflow-y: auto; margin-top: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    #autocomplete-list div {
+      padding: 10px 16px; cursor: pointer; font-size: 0.9rem;
+      color: var(--text-primary); transition: background 0.15s;
+    }
+    #autocomplete-list div:hover { background: rgba(59,130,246,0.15); }
+    .player-header-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px;
+      position: relative; overflow: hidden;
+    }
+    .player-header-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #00d68f);
+    }
+    .player-name-big { font-size: 1.9rem; font-weight: 800; letter-spacing: -1px; }
+    .stat-badge-big {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 8px; padding: 4px 14px;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; color: white;
+    }
+    .prediction-chip {
+      display: inline-flex; align-items: center;
+      gap: 10px; padding: 12px 22px; border-radius: 50px;
+      font-weight: 700; font-size: 1.05rem;
+    }
+    .prediction-chip.over {
+      background: rgba(0,214,143,0.12); border: 1px solid rgba(0,214,143,0.3);
+      color: var(--accent-green); box-shadow: 0 0 20px rgba(0,214,143,0.2);
+    }
+    .prediction-chip.under {
+      background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.3);
+      color: var(--accent-red); box-shadow: 0 0 20px rgba(255,77,109,0.2);
+    }
+    .dot-indicator { width: 9px; height: 9px; border-radius: 50%; animation: pulse 1.5s infinite; }
+    .dot-indicator.green { background: var(--accent-green); }
+    .dot-indicator.red { background: var(--accent-red); }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+    .metric-card {
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; text-align: center; transition: border-color 0.2s;
+    }
+    .metric-card:hover { border-color: rgba(59,130,246,0.3); }
+    .metric-value { font-size: 1.6rem; font-weight: 800; margin-bottom: 2px; }
+    .metric-label { font-size: 0.66rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+    .hit-rate-bar-wrap { background: var(--bg-input); border-radius: 50px; height: 8px; overflow: hidden; margin-top: 6px; }
+    .hit-rate-bar-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, #3b82f6, #00d68f); transition: width 1s ease; }
+    .book-card {
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;
+    }
+    .book-card:hover { border-color: rgba(59,130,246,0.3); background: var(--bg-card-hover); }
+    .book-name { font-weight: 700; font-size: 0.95rem; }
+    .book-line { font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px; }
+    .ev-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+    .ev-badge.positive { background: rgba(0,214,143,0.15); color: var(--accent-green); border: 1px solid rgba(0,214,143,0.3); }
+    .ev-badge.negative { background: rgba(255,77,109,0.15); color: var(--accent-red); border: 1px solid rgba(255,77,109,0.3); }
+    .lean-tag { font-size: 0.82rem; font-weight: 800; letter-spacing: 0.5px; }
+    .lean-tag.over { color: var(--accent-green); }
+    .lean-tag.under { color: var(--accent-red); }
+    .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+    .section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+    .model-score-pill {
+      background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 50px; padding: 4px 12px; font-size: 0.72rem; font-weight: 700;
+      color: var(--accent-gold); letter-spacing: 0.5px;
+    }
+    .error-banner {
+      background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3);
+      border-radius: 14px; padding: 20px; color: var(--accent-red); font-weight: 600;
+    }
+    .loading-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,14,26,0.85); backdrop-filter: blur(8px);
+      z-index: 9999; align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+    }
+    .loading-overlay.show { display: flex; }
+    .spinner-ring {
+      width: 56px; height: 56px;
+      border: 4px solid rgba(255,255,255,0.1); border-top-color: #3b82f6;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .legend-row { display: flex; gap: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-secondary); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    /* Utility color classes (replaces inline Jinja style attrs) */
+    .color-green { color: var(--accent-green); }
+    .color-red   { color: var(--accent-red); }
+    .color-gold  { color: var(--accent-gold); }
+    .defense-card[data-rank="tough"] { border-color: rgba(255,77,109,0.3) !important; color: var(--accent-red); }
+    .defense-card[data-rank="avg"]   { border-color: rgba(245,158,11,0.3) !important; color: var(--accent-gold); }
+    .defense-card[data-rank="weak"]  { border-color: rgba(0,214,143,0.3) !important; color: var(--accent-green); }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner-ring"></div>
+  <p style="color:var(--text-secondary);font-size:0.9rem;font-weight:600;">Fetching player data & running ML model...</p>
+</div>
+
+<nav class="navbar-custom">
+  <div class="container d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-3">
+      <span class="nav-logo">⚡ PropsEdge</span>
+      <span class="nav-badge">NBA 2025-26</span>
+    </div>
+    <span style="font-size:0.78rem;color:var(--text-muted);">Portfolio Project · Not Betting Advice</span>
+  </div>
+</nav>
+
+<div class="container py-5" style="max-width:900px;">
+  <div class="text-center mb-5">
+    <h1 style="font-size:2.4rem;font-weight:900;letter-spacing:-1.5px;margin-bottom:10px;">
+      NBA Player Props
+      <span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">Edge Finder</span>
+    </h1>
+    <p style="color:var(--text-secondary);font-size:1rem;max-width:520px;margin:0 auto;line-height:1.7;">
+      ML-powered predictions with sportsbook line comparison, hit rate analysis, and trend visualization.
+    </p>
+  </div>
+
+  <div class="search-section mb-4">
+    <form method="POST" id="analyzeForm">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+          <div class="section-label">Player Name</div>
+          <div style="position:relative;">
+            <input id="playerInput" name="player_name" class="fc"
+              placeholder="LeBron James, Jayson Tatum..." autocomplete="off" required
+              value="{{ request.form.get('player_name','') }}"/>
+            <div id="autocomplete-list"></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="section-label">Stat Type</div>
+          <div class="stat-pills">
+            {% set stat_labels = [
+              ('PTS','PTS'),('REB','REB'),('AST','AST'),('PRA','PRA'),('3PM','3PM'),
+              ('PTS_AST','PTS+AST'),('PTS_REB','PTS+REB'),('REB_AST','REB+AST')
+            ] %}
+            {% for s, label in stat_labels %}
+            <div class="stat-pill {% if request.form.get('stat','PTS') == s %}active{% endif %}" data-stat="{{ s }}">{{ label }}</div>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="stat" id="stat-hidden" value="{{ request.form.get('stat','PTS') }}"/>
+        </div>
+        <div class="col-md-3">
+          <div class="section-label">Prop Line</div>
+          <input name="line" type="number" step="0.5" class="fc" placeholder="24.5" required
+            value="{{ request.form.get('line','') }}"/>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end mt-4">
+        <button type="submit" class="btn-analyze">⚡ Analyze Prop</button>
+      </div>
+    </form>
+  </div>
+
+  {% if error %}
+  <div class="error-banner mb-4">⚠️ {{ error }}</div>
+  {% endif %}
+
+  {% if result %}
+  <div class="player-header-card mb-4">
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="stat-badge-big">{{ result.stat }}</span>
+          <span class="model-score-pill">Model R² {{ result.score }}</span>
+        </div>
+        <div class="player-name-big">{{ result.player }}</div>
+      </div>
+      <div class="text-end">
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;">ML Signal</div>
+        <div class="prediction-chip {{ 'over' if result.lean=='OVER' else 'under' }}">
+          <div class="dot-indicator {{ 'green' if result.lean=='OVER' else 'red' }}"></div>
+          <span>Predicted {{ result.prediction }}</span>
+          <span style="opacity:0.5;">vs</span>
+          <span>Line {{ result.line }}</span>
+          <strong>{{ result.lean }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="metrics-grid mb-4">
+      <div class="metric-card">
+        <div class="metric-value" style="color:var(--accent-blue);">{{ result.prediction }}</div>
+        <div class="metric-label">Prediction</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" style="color:var(--text-primary);">{{ result.line }}</div>
+        <div class="metric-label">Prop Line</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" style="color:var(--accent-gold);">{{ result.ev }}%</div>
+        <div class="metric-label">Best EV</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value metric-hit-rate
+          {%- if result.hit_rate >= 60 %} color-green
+          {%- elif result.hit_rate >= 40 %} color-gold
+          {%- else %} color-red{% endif %}">
+          {{ result.hit_rate }}%
+        </div>
+        <div class="metric-label">L10 Hit Rate</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" style="color:var(--text-primary);">{{ result.avg_last10 }}</div>
+        <div class="metric-label">L10 Average</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="d-flex justify-content-between mb-1">
+        <span style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">
+          Hit Rate · Last 10 Games vs {{ result.line }} Line
+        </span>
+        <span style="font-size:0.75rem;font-weight:800;" class="{{ 'color-green' if result.hit_rate >= 60 else 'color-red' }}">
+          {{ result.hits }} / 10
+        </span>
+      </div>
+      <div class="hit-rate-bar-wrap">
+        <div class="hit-rate-bar-fill" data-width="{{ result.hit_rate }}"></div>
+      </div>
+    </div>
+  </div>
+
+  
+  {% if result.defense %}
+  <div class="mb-4">
+    <div class="section-title">🛡️ Opponent Defensive Rankings — {{ result.defense.team_name }}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+      {% for stat_key, info in result.defense.all_ranks.items() %}
+
+      {% if info.rank <= 10 %}
+        {% set rank_color = 'defense-tough' %}
+      {% elif info.rank <= 20 %}
+        {% set rank_color = 'defense-avg' %}
+      {% else %}
+        {% set rank_color = 'defense-weak' %}
+      {% endif %}
+
+      {% if info.rank <= 10 %}
+        {% set rank_emoji = '🔴' %}
+      {% elif info.rank <= 20 %}
+        {% set rank_emoji = '🟡' %}
+      {% else %}
+        {% set rank_emoji = '🟢' %}
+      {% endif %}
+
+      <div class="metric-card {{ rank_color }}-border">
+        <div class="metric-label" style="margin-bottom:6px;">{{ info.label }} Allowed</div>
+        <div class="metric-value {{ rank_color }}">{{ info.avg }}</div>
+        <div style="font-size:0.75rem;font-weight:700;margin-top:4px;" class="{{ rank_color }}">
+          {{ rank_emoji }} Rank #{{ info.rank }}/30
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;">
+    🔴 Top 10 = Tough · 🟡 11–20 = Average · 🟢 21–30 = Weak Defense
+    </div>
+  </div>
+  {% endif %}
+
+
+  <div class="mb-4">
+    <div class="section-title">📊 Sportsbook Line Comparison</div>
+    <div class="d-flex flex-column gap-2">
+      {% for book, info in result.odds.items() %}
+      <div class="book-card">
+        <div>
+          <div class="book-name">{{ book }}</div>
+          <div class="book-line">Line: <strong style="color:var(--text-primary);">{{ info.line }}</strong></div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span class="lean-tag {{ info.lean | lower }}">{{ info.lean }}</span>
+          <span class="ev-badge {{ 'positive' if info.lean == 'OVER' else 'negative' }}">EV {{ info.ev }}%</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+      <div>
+        <div style="font-size:1rem;font-weight:700;">Last 10 Games — {{ result.stat }}</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+          Green = Hit · Red = Miss · Dashed = Line
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-green);"></div> Hit</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-red);"></div> Miss</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-purple);"></div> Prediction</div>
+      </div>
+    </div>
+    {{ chart|safe }}
+  </div>
+  {% endif %}
+
+  <div style="text-align:center;font-size:0.72rem;color:var(--text-muted);margin-top:48px;padding-bottom:32px;">
+    ⚠️ For educational & portfolio purposes only. Not financial or betting advice.<br/>
+    Data sourced from NBA Stats API · Built with Flask, scikit-learn & Plotly
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.stat-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.stat-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      document.getElementById('stat-hidden').value = pill.dataset.stat;
+    });
+  });
+
+  document.getElementById('analyzeForm').addEventListener('submit', () => {
+    document.getElementById('loadingOverlay').classList.add('show');
+  });
+
+  const playerInput = document.getElementById('playerInput');
+  const acList = document.getElementById('autocomplete-list');
+  let debounce;
+  playerInput.addEventListener('input', () => {
+    clearTimeout(debounce);
+    const q = playerInput.value.trim();
+    if (q.length < 2) { acList.innerHTML = ''; return; }
+    debounce = setTimeout(() => {
+      fetch(`/suggest?q=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(names => {
+          acList.innerHTML = '';
+          names.slice(0, 8).forEach(name => {
+            const d = document.createElement('div');
+            d.textContent = name;
+            d.onclick = () => { playerInput.value = name; acList.innerHTML = ''; };
+            acList.appendChild(d);
+          });
+        });
+    }, 250);
+  });
+  document.addEventListener('click', e => { if (!playerInput.contains(e.target)) acList.innerHTML = ''; });
+
+  // Apply hit-rate bar width from data attribute (avoids Jinja inside style attr)
+  document.querySelectorAll('.hit-rate-bar-fill[data-width]').forEach(el => {
+    el.style.width = el.dataset.width + '%';
+  });
+</script>
+</body>
+</html>
