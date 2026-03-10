@@ -7,7 +7,8 @@ A full-stack data science web application that predicts NBA player prop outcomes
 ⚠️ For educational and portfolio purposes only. Not financial or betting advice.
 
 🖼️ Preview
-(<Screenshot 2026-03-10 at 3.57.27 PM.png>)
+![alt text](<Screenshot 2026-03-10 at 3.57.27 PM.png>)
+
 A dark-mode dashboard inspired by PrizePicks, featuring:
 ML-powered OVER/UNDER prediction vs. your submitted prop line
 Last-10 game hit rate with animated progress bar
