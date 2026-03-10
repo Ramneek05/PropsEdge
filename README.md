@@ -17,7 +17,7 @@ Real-time sportsbook line comparison with EV% across FanDuel, DraftKings, BetMGM
 
 
 🏗️ Tech Stack
-LayerTechnologyBackendPython 3, FlaskML Modelscikit-learn — Ridge RegressionData SourceESPN Stats API (no key required)VisualizationPlotly — interactive, dark-themed chartsFrontendJinja2, Bootstrap 5, Vanilla JSDeploymentRender (live web app)
+LayerTechnology BackendPython 3, FlaskML Modelscikit-learn — Ridge RegressionData SourceESPN Stats API (no key required)Visualization Plotly — interactive, dark-themed charts, FrontendJinja2, Bootstrap 5, Vanilla JSDeploymentRender (live web app)
 
 🚀 Features
 🤖 Machine Learning
@@ -59,7 +59,7 @@ cd nba-props-edge
 
 # 2. Create virtual environment
 python3 -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate   # For Windows: .venv\Scripts\activate
 
 # 3. Install dependencies
 pip install -r requirements.txt
