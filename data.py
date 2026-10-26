@@ -64,7 +64,7 @@ def find_espn_player_id(player_name):
     return None, None
 
 
-def get_player_data(player_name, season="2026"):
+def get_player_data(player_name, season="2027"):
     player_id, found_name = find_espn_player_id(player_name)
     if not player_id:
         print(f"[WARN] Could not find ESPN ID for '{player_name}'")
