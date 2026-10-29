@@ -64,7 +64,15 @@ def find_espn_player_id(player_name):
     return None, None
 
 
-def get_player_data(player_name, season="2027"):
+def get_player_data(player_name, season="2027", min_games=15):
+    df = _get_season_data(player_name, season)
+    if len(df) < min_games:
+        prev = _get_season_data(player_name, str(int(season) - 1))
+        if not prev.empty:
+            df = pd.concat([prev, df]).sort_values("GAME_DATE").reset_index(drop=True)
+    return df
+
+def _get_season_data(player_name, season="2027"):
     player_id, found_name = find_espn_player_id(player_name)
     if not player_id:
         print(f"[WARN] Could not find ESPN ID for '{player_name}'")

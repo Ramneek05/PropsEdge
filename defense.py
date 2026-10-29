@@ -110,7 +110,7 @@ def build_defense_cache():
     # Compute averages and build cache
     rows = []
     for abbr, stats in allowed.items():
-        if len(stats["pts"]) < 5:
+        if len(stats["pts"]) < 1:
             continue
         rows.append({
             "abbr":       abbr,
